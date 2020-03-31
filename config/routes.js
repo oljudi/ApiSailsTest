@@ -33,5 +33,9 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
+  'GET /api/champs': 'ChampsController.get',
+  'POST /api/champs': 'ChampsController.create',
+  'PUT /api/champs/:id': 'ChampsController.update',
+  'DELETE /api/champs/:id': 'ChampsController.delete'
 
 };
