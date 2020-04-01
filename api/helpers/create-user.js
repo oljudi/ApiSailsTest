@@ -6,7 +6,7 @@ module.exports = {
   friendlyName: 'Create user',
 
 
-  description: 'Create a new User',
+  description: 'Create a new User on the DB, hash the password',
 
 
   inputs: {
@@ -33,9 +33,8 @@ module.exports = {
 
 
   fn: async (inputs, exits) => {
-    sails.log.debug('Im here')
     const attr = {
-      id: sails.helpers.randomCrytoString({ size: 32}).execSync(),
+      jwt: sails.helpers.randomCryptoString.with({ size: 32 }),
       email: inputs.email.toLowerCase(),
     }
     if(inputs.password){

@@ -41,7 +41,8 @@ module.exports.routes = {
 
   /* LOGIN - SIGNUP */
   'POST /api/signup': 'UserController.signup',
-  'GET /api/login': 'UserController.login',
+  'POST /api/login': 'UserController.login',
+  'GET /api/logout': 'UserController.logout',
   'GET /api/check': 'UserController.check'
 
 };

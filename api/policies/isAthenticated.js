@@ -1,14 +1,15 @@
 module.exports = async (req, res, next) => {
-  await sails.helpers.verifyJwt(req, res).switch({
+  await sails.helpers.verifyJwt.with(req, res).exec({
     error: err => res.serverError(err),
     invalid: err => {
-      if (req.wantsJSON)
-      {return res
-          .status(401)
-          .send({ success: false, msg: 'Error, please login first', error: err });}
-      return res
-        .status(401)
-        .send({ success: false, msg: 'Error please login first', error: err });
+      if (req.wantsJSON) {
+        return res.sendStatus(401);
+      }
+      return res.send({
+        success: false,
+        msg: 'something went wrong',
+        err
+      });
     },
     success: () => next()
   });

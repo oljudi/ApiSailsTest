@@ -29,15 +29,18 @@ module.exports = {
   fn: async (inputs, exits) => {
     const req = inputs.req;
     const res = inputs.res;
-    if (req.header('authorization')) {
-      const token = req.header('authorization').split('Bearer ')[1];
-      if (!token) {return exits.invalid();}
-      return jwt.verify(token, process.env.JWT_KEY, async (err, payload) => {
-        if (err || !payload.sub) {return exits.invalid();}
-        req.user = user;
-        return exits.success(user);
-      });
+    if (req.signedCookie.sailsjwt) {
+      return jwt.verify(
+        req.signedCookie.sailsjwt,
+        sails.config.jwtSecret,
+        async (err, payload) => {
+          if (err || !payload.user) {return exits.invalid();}
+          const user = await User.findOne(payload.user);
+          if (!user) {return exits.invalid();}
+          req.user = user;
+          return exits.success(user);
+        }
+      );
     }
-    return exits.invalid()
   }
 };

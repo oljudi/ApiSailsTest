@@ -9,8 +9,6 @@ const jwt = require('jsonwebtoken');
 const Emailaddresses = require('machinepack-emailaddresses');
 const bcrypt = require('bcryptjs');
 
-// const validator = require('email-validator');
-
 module.exports = {
   signup: (req, res) => {
     const { email, password } = req.body;
@@ -23,7 +21,6 @@ module.exports = {
     if (password.length < 8) {
       return res.badRequest('Password must be at least 8 characters.');
     }
-    sails.log.debug(typeof email);
     Emailaddresses.validate({
       string: email
     }).exec({
@@ -34,35 +31,70 @@ module.exports = {
         return res.badRequest('Does not look like an email address');
       },
       success: async () => {
-        // const user = await sails.helpers.createUser({
-        //   email: email,
-        //   password: password
-        // });
-
-        const attr = {
-          jwtId: sails.helpers.randomCryptoString.with({ size: 32 }),
-          email: email.toLowerCase()
-        };
-        if (password) {
-          attr.password = await bcrypt.hash(password, 10);
-
-          const user = await User.create(attr).fetch();
-          const token = jwt.sign({ user: user.jwtId }, sails.config.jwtSecret, {
-            expiresIn: sails.config.jwtExpires
-          });
-          res.cookie('sailsjwt', token, {
-            signed: true,
-            maxAge: 180 // WtF whit this shit - Should check this value
-          });
-          if (req.wantsJSON) {
-            return res.ok(token);
-          }
+        // Call the helper create user (whit required or crash)
+        const user = await sails.helpers.createUser.with({
+          email: email,
+          password: password
+        });
+        // Once the user is created this create the JWT
+        const token = jwt.sign({ user: user.jwt }, sails.config.jwtSecret, {
+          expiresIn: sails.config.jwtExpires
+        });
+        // Send Token to the cookies
+        res.cookie('sailsjwt', token, {
+          signed: true,
+          maxAge: 180 // WtF whit this shit - Should check this value
+        });
+        // Show in the token given and the succesfull status
+        if (req.wantsJSON) {
           return res.send({
             success: true,
-            message: 'User successfully created!!'
+            message: 'User sucessfully created!',
+            token: token
           });
         }
       }
+    });
+  },
+  login: async (req, res) => {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.notFound();
+    }
+
+    await bcrypt.compare(password, user.password, (err, exit) => {
+      if (err) {
+        return res.serverError();
+      }
+      if (exit) {
+        const token = jwt.sign({ user: user.jwt }, sails.config.jwtSecret, {
+          expiresIn: sails.config.jwtExpires
+        });
+        res.cookie('sailsjwt', token, {
+          signed: true,
+          maxAge: 180 // Check this value
+        });
+        if (req.wantsJSON) {
+          return res.send({
+            success: true,
+            message: 'User logged && and JWT storage in a cookie'
+          });
+        }
+      } else {
+        return res.send({
+          success: 'false',
+          message: 'Password do not match'
+        });
+      }
+    });
+  },
+  logout: (req, res) => {
+    res.clearCookie('sails.sid');
+    req.user = null;
+    return res.send({
+      success: true,
+      message: 'User logout, bai bai'
     });
   }
 };
