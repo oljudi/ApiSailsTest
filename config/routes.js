@@ -33,9 +33,15 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
+  /* CHAMP CRUD - TUTORIAL CRUD*/
   'GET /api/champs': 'ChampsController.get',
   'POST /api/champs': 'ChampsController.create',
   'PUT /api/champs/:id': 'ChampsController.update',
-  'DELETE /api/champs/:id': 'ChampsController.delete'
+  'DELETE /api/champs/:id': 'ChampsController.delete',
+
+  /* LOGIN - SIGNUP */
+  'POST /api/signup': 'UserController.signup',
+  'GET /api/login': 'UserController.login',
+  'GET /api/check': 'UserController.check'
 
 };
