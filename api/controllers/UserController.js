@@ -43,7 +43,8 @@ module.exports = {
         // Send Token to the cookies
         res.cookie('sailsjwt', token, {
           signed: true,
-          maxAge: 180 // WtF whit this shit - Should check this value
+          expires: new Date(Date.now() + 900000),
+          httpOnly: true
         });
         // Show in the token given and the succesfull status
         if (req.wantsJSON) {
@@ -73,7 +74,8 @@ module.exports = {
         });
         res.cookie('sailsjwt', token, {
           signed: true,
-          maxAge: 180 // Check this value
+          expires: new Date(Date.now() + 900000),
+          httpOnly: true
         });
         if (req.wantsJSON) {
           return res.send({
@@ -90,11 +92,17 @@ module.exports = {
     });
   },
   logout: (req, res) => {
-    res.clearCookie('sails.sid');
+    res.clearCookie('sailsjwt');
     req.user = null;
     return res.send({
       success: true,
       message: 'User logout, bai bai'
     });
+  },
+  check: (req, res) => {
+    res.send({
+      success: true,
+      message: 'YES I PASS'
+    })
   }
 };
