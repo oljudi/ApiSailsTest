@@ -11,7 +11,7 @@
     "bcryptjs": "^2.4.3",
     "crypto": "^1.0.1",
     "email-validator": "^2.0.4",
-    "grunt": "1.0.4",
+    "grunt": "1.5.2",
     "jsonwebtoken": "^8.5.1",
     "machinepack-emailaddresses": "^0.4.0",
     "passport": "^0.4.1",
